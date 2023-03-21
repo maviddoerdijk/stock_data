@@ -21,7 +21,11 @@ except:
     print("yahoo_fin module not working")
 
 
-class filter:
+class main:
+
+    def __init__(self):
+        #just do something random here for now
+        self.var = 0
 
     def print_data(self, watchlists):
         names = watchlists.keys()
@@ -32,20 +36,49 @@ class filter:
             data_total = ticker.financial_data
             return data_total
 
-    def filter_stocks(self, constraints) -> list:
+    def filter_stocks(self, watchlists, constraints: list) -> list:
         # begin with empty list, all stocks that satisfy constraints will be added
-        stock_names = []
+        stock_names_satisfying = []
+        
+        data_total = self.print_data(watchlists)
+        stock_names = data_total.keys()
+
+        inner_instance = self.constraints()
+        
+        for stock_name in stock_names:
+            stock_data = data_total[stock_name]
+            if "revenue_growth" in constraints:
+                revenue_bool = inner_instance.revenue_growth(stock_name, stock_data)
+                print(revenue_bool)
+                if revenue_bool:
+                    stock_names_satisfying.append(stock_name)
+
+        return stock_names_satisfying
+    
+    # functions of this inner class should only have to be used by the outer class filter.
+    class constraints:
+        def __init__(self):
+            #something random again
+            self.var2 = 0
+
+        def revenue_growth(self, stock_name, stock_data):
+
+            if stock_data["revenueGrowth"] > 0:
+                print('too low')
+                return True
 
 
 
-        print(stock_names)
+            return False
 
 
 
 # instance of the class to be able to call function
-inst = filter()
+inst = main()
 shit = inst.print_data(watchlists_kfc)
-print(shit)
+print(shit['aapl']['revenueGrowth'])
 
+names_that_satisfy_constraints = inst.filter_stocks(watchlists_kfc, ["revenue_growth"])
+print(names_that_satisfy_constraints)
 
 
