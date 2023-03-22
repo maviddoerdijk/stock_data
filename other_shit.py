@@ -1,6 +1,4 @@
-import yfinance as yf
+import yahooquery
 
-msft = yf.Ticker("MSFT")
-
-# get all stock info (slow)
-msft.info
+ticker = yahooquery.Ticker("aapl")
+print(ticker.financial_data['aapl'].keys())
