@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Flask Example</title>
+    </head>
+    <body>
+        <form method="post">
+            <label for="string">Enter a list of stocks:</label>
+            <input type="text" id="string" name="string">
+            <input type="submit" value="Submit">
+        </form>
+        {% if result %}
+            <p>The stocks that fulfill your constraints are: {{ result }}</p>
+        {% endif %}
+    </body>
+</html>
