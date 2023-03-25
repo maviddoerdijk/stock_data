@@ -1,12 +1,11 @@
 import yfinance as yf
 from yahoo_fin import stock_info as si
+import yahooquery
 
+ticker = yahooquery.Ticker("MSFT")
+data_total = ticker.financial_data
 
-# We'll start by only looking through stocks in SP500, later we'll use more (maybe even all stocks?) 
-tickers = si.tickers_sp500()
-print(tickers)
-
-print(ticker.info)
+print(data_total["MSFT"].keys())
 
 # # Get a list of all publicly traded companies
 # tickers = yf.Tickers('')
@@ -19,3 +18,7 @@ print(ticker.info)
 #     # Check if the company has market cap data and if it is above 300 billion
 #     if 'marketCap' in data and data['marketCap'] > 2*(10**6):
 #         print(data['symbol'], data['longName'])
+
+
+
+

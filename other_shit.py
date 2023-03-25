@@ -1,4 +1,3 @@
-import yahooquery
+bool_list = [True, True]
 
-ticker = yahooquery.Ticker("aapl")
-print(ticker.financial_data['aapl'].keys())
+print(all(bool_list))

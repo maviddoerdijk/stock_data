@@ -1,6 +1,11 @@
 import yahooquery
 from yahoo_fin import stock_info as si
 
+# for logging errors to file
+import logging
+logging.basicConfig(filename='errors.log', level=logging.DEBUG, 
+                    format='%(asctime)s %(levelname)s %(name)s %(message)s')
+logger=logging.getLogger(__name__)
 
 
 """
@@ -14,8 +19,8 @@ watchlists_general = {"S&P500": ['A', 'AAL', 'AAP', 'AAPL', 'ABBV', 'ABC', 'ABT'
 try:
     stock_names_SP500 = si.tickers_sp500()
     watchlists_general["S&P500"] = stock_names_SP500
-except:
-    print("yahoo_fin module not working")
+except Exception as e:
+    logger.error(e)
 
 
 class main:
@@ -36,11 +41,11 @@ class main:
     def filter_stocks(self, watchlists, constraints: dict) -> list:
         # begin with empty list, all stocks that satisfy constraints will be added
         stock_names_satisfying = []
+        bool_dict = {}
         
         data_total = self.print_data(watchlists)
         stock_names = data_total.keys()
 
-        inner_instance = self.constraints()
         
         for stock_name in stock_names:
             stock_data = data_total[stock_name]
@@ -48,46 +53,61 @@ class main:
             try:
                 if "revenue_growth" in constraints.keys():
                     constraint_value = constraints["revenue_growth"]
-                    if inner_instance.revenue_growth(stock_data, constraint_value):
-                        stock_names_satisfying.append(stock_name)
+                    revenue_bool = inner_instance.revenue_growth(stock_data, constraint_value)
+                    bool_dict["revenue_growth"] = revenue_bool    
             except:
                 continue
 
             try:
                 if "debt_to_ebitda" in constraints.keys():
                     constraint_value = constraints["debt_to_ebitda"]
-                    if inner_instance.debt_2_equity(stock_data, constraint_value):
-                        stock_names_satisfying.append(stock_name)
+                    debt_to_ebidta_bool = inner_instance.debt_2_equity(stock_data, constraint_value)
+                    bool_dict["debt_to_ebitda"] = debt_to_ebidta_bool    
             except:
                 continue
+            
+            #append stock name to end list if all values of dictionary are true
+            if all(bool_dict.values()):
+                stock_names_satisfying.append(stock_name)
+
 
         return stock_names_satisfying
     
-    # functions of this inner class should only have to be used by the outer class filter.
-    class constraints:
-        def __init__(self):
-            #something random again
-            self.var2 = 0
-
-        def revenue_growth(self, stock_data, constraint_value):
-
-            if stock_data["revenueGrowth"] > constraint_value:
-                print('Revenue growth positive!')
-                return True
-            return False
-        
-        def debt_2_equity(self, stock_data, constraint_value):
-            debt_to_ebidta = stock_data["totalDebt"] / stock_data["ebitda"]
-            if debt_to_ebidta < constraint_value:
-                return True
-            return False
 
 
+# functions of this inner class should only have to be used by the outer class filter.
+class constraints:
+    def __init__(self):
+        #something random again
+        self.var2 = 0
+
+    def revenue_growth(self, stock_data, constraint_value):
+
+        if stock_data["revenueGrowth"] > constraint_value:
+            return True
+        return False
+    
+    def debt_2_equity(self, stock_data, constraint_value):
+        debt_to_ebidta = stock_data["totalDebt"] / stock_data["ebitda"]
+        if debt_to_ebidta < constraint_value:
+            return True
+        return False
+    
+    # TODO: create constraints for ROIC - Price to Earnings - dividends 
+
+
+inner_instance = constraints()
 
 # instance of the class to be able to call function
 inst = main()
 
-names_that_satisfy_constraints = inst.filter_stocks(watchlists_general, {"revenue_growth": 0.2, "debt_to_ebitda": 0.2})
+
+# dictionaries of types of constraints
+constraints_random = {"revenue_growth": 0.2, "debt_to_ebitda": 0.2}
+
+
+
+names_that_satisfy_constraints = inst.filter_stocks(watchlists_general, constraints_random)
 print(names_that_satisfy_constraints)
 
 
