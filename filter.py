@@ -107,7 +107,7 @@ constraints_random = {"revenue_growth": 0.2, "debt_to_ebitda": 0.2}
 
 
 
-names_that_satisfy_constraints = inst.filter_stocks(watchlists_general, constraints_random)
-print(names_that_satisfy_constraints)
+# names_that_satisfy_constraints = inst.filter_stocks(watchlists_general, constraints_random)
+# print(names_that_satisfy_constraints)
 
 
